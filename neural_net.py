@@ -3,6 +3,10 @@ from scipy import optimize
 
 """
 Supervised regression problem
+Completed with motivation and direction from
+Welch Labs (http://www.welchlabs.com/)
+
+author: Oluwatobi Oni-Orisan
 """
 
 def main(): 
@@ -29,20 +33,19 @@ def main():
   """
   Sample out put from out neural network on first pass. We learn that our neural net is pretty dumb tho. So lets minimize this loss.
   """
+  print "---Before training---"
   NN = Neural_Network()
   yHat = NN.forward(x)
-  print yHat
-
-  NN = Neural_Network()
+  print "yHat: \n", yHat
   cost1 = NN.costFunction(x, y)
   dJdW1, dJdW2 = NN.costFunctionPrime(x, y)
-  print cost1
+  print "cost: ", cost1
 
-  NN = Neural_Network()
   T = trainer(NN)
   T.train(x, y)
+  print "---After training---"
   yHat = NN.forward(x)
-  print yHat
+  print "yHat: \n", yHat
 
 
 """
