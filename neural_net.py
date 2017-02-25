@@ -98,7 +98,7 @@ class Neural_Network(object):
     delta3 = np.multiply(-(y-self.yHat), self.sigmoidPrime(self.z3))
     dJdW2 = np.dot(self.a2.T, delta3)
 
-    delta2 = np.dot(delta3, self.W2.T) * self.sigmoidPrime(self.a2)
+    delta2 = np.dot(delta3, self.W2.T) * self.sigmoidPrime(self.z2)
     dJdW1 = np.dot(X.T, delta2)
 
     return dJdW1, dJdW2
@@ -119,6 +119,32 @@ class Neural_Network(object):
   def computeGradients(self, X, y):
     dJdW1, dJdW2 = self.costFunctionPrime(X, y)
     return np.concatenate((dJdW1.ravel(), dJdW2.ravel()))
+
+def computeNumericalGradient(N, X, y):
+  paramsInitial = N.getParams()
+  numgrad = np.zeros(paramsInitial.shape)
+  perturb = np.zeros(paramsInitial.shape)
+  e = 1e-4
+
+  for p in range(len(paramsInitial)):
+    # Set perturbation vector
+    perturb[p] = e
+    N.setParams(paramsInitial + perturb)
+    loss2 = N.costFunction(X, y)
+
+    N.setParams(paramsInitial - perturb)
+    loss1 = N.costFunction(X, y)
+
+    # Compute Numerical Gradient
+    numgrad[p] = (loss2 - loss1) / (2 * e)
+
+    # Return the value we changed to zero:
+    perturb[p] = 0
+
+  # Return Params to original value
+  N.setParams(paramsInitial)
+
+  return numgrad
 
 class trainer(object):
   def __init__(self, N):
@@ -150,32 +176,6 @@ class trainer(object):
 
     self.N.setParams(_res.x)
     self.optimizationResults = _res
-
-def computeNumericalGradient(N, X, y):
-  paramsInitial = N.getParams()
-  numgrad = np.zeros(paramsInitial.shape)
-  perturb = np.zeros(paramsInitial.shape)
-  e = 1e-4
-
-  for p in range(len(paramsInitial)):
-    # Set perturbation vector
-    perturb[p] = e
-    N.setParams(paramsInitial + perturb)
-    loss2 = N.costFunction(X, y)
-
-    N.setParams(paramsInitial - perturb)
-    loss1 = N.costFunction(X, y)
-
-    # Compute Numerical Gradient
-    numgrad[p] = (loss2 - loss1) / (2 * e)
-
-    # Return the value we changed to zero:
-    perturb[p] = 0
-
-  # Return Params to original value
-  N.setParams(paramsInitial)
-
-  return numgrad
 
 if __name__ == '__main__':
   main()
